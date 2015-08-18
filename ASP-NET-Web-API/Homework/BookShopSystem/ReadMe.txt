@@ -1,0 +1,1 @@
+Important - run BookShopSystem.Client to seed your database, before you do anything else! 
