@@ -4,22 +4,12 @@
     using System.Linq;
     using System.Web.Http;
     using BookShopSystem.Models;
-    using Data;
-    using Infrastructure;
     using Models.BindingModels;
     using Models.ViewModels;
 
     [RoutePrefix("api/Books")]
     public class BooksController : BaseApiController
     {
-        private IUserIdProvider userIdProvider;
-
-        public BooksController(IBookShopData data, IUserIdProvider userIdProvider)
-            : base(data)
-        {
-            this.userIdProvider = userIdProvider;
-        }
-
         [HttpGet]
         [Route("{id}")]
         public IHttpActionResult GetBook(int id)
@@ -30,9 +20,9 @@
                 return this.BadRequest("Book does not exist - invalid id");
             }
 
-            var bookViewModel = BookViewModel.ConvertToBookViewModel(book); 
+            var bookViewModel = BookViewModel.ConvertToBookViewModel(book);
 
-            return Ok(bookViewModel);
+            return this.Ok(bookViewModel);
         }
 
         [HttpPost]
@@ -87,7 +77,7 @@
             this.data.Save();
 
             BookViewModel bookViewModel = BookViewModel.ConvertToBookViewModel(book);
-            return Ok(bookViewModel);
+            return this.Ok(bookViewModel);
         }
 
         [HttpDelete]
@@ -104,7 +94,7 @@
             this.data.Books.Delete(book);
             this.data.Save();
 
-            return Ok();
+            return this.Ok();
         }
 
         [HttpPut]
@@ -143,7 +133,7 @@
 
             BookViewModel bookViewModel = BookViewModel.ConvertToBookViewModel(existingBook);
 
-            return Ok(bookViewModel);
+            return this.Ok(bookViewModel);
         }
 
         [HttpGet]
@@ -154,11 +144,11 @@
                 .Books
                 .All()
                 .Where(b => b.Title.Contains(word))
-                .Select(BookViewModelMinified.ConvertToBookViewModel)
+                .Select(BookViewModelMinified.Create)
                 .OrderBy(b => b.Title)
                 .Take(10);
 
-            return Ok(books);
+            return this.Ok(books);
         }
 
         [HttpPut]
@@ -200,8 +190,8 @@
             this.data.Save();
 
             PurchaseViewModel purchaseViewModel = PurchaseViewModel.ConvertToPurchaseViewModel(purchase);
-            
-            return Ok(purchaseViewModel);
+
+            return this.Ok(purchaseViewModel);
         }
 
         [HttpPut]
@@ -241,7 +231,7 @@
 
             this.data.Save();
 
-            return Ok();
+            return this.Ok();
         }
     }
 }

@@ -3,22 +3,12 @@
     using System.Linq;
     using System.Web.Http;
     using BookShopSystem.Models;
-    using Data;
-    using Infrastructure;
     using Models.BindingModels;
     using Models.ViewModels;
 
     [RoutePrefix("api/Authors")]
     public class AuthorsController : BaseApiController
     {
-        private IUserIdProvider userIdProvider;
-
-        public AuthorsController(IBookShopData data, IUserIdProvider userIdProvider)
-            : base(data)
-        {
-            this.userIdProvider = userIdProvider;
-        }
-
         [HttpGet]
         public IHttpActionResult GetById(int id)
         {
@@ -26,7 +16,7 @@
                 .Authors
                 .All()
                 .Where(a => a.Id == id)
-                .Select(AuthorViewModel.ConvertToAuthorViewModel)
+                .Select(AuthorViewModel.Create)
                 .FirstOrDefault();
 
             if (author == null)
@@ -34,7 +24,7 @@
                 return this.BadRequest("Author does not exit - invalid id!");
             }
 
-            return Ok(author);
+            return this.Ok(author);
         }
 
         [HttpPost]
@@ -56,7 +46,7 @@
             this.data.Save();
 
             AuthorViewModel authorViewModel = AuthorViewModel.ConvertToAuthorViewModel(author);
-            return Ok(authorViewModel);
+            return this.Ok(authorViewModel);
         }
 
         [HttpGet]
@@ -69,9 +59,12 @@
                 return this.BadRequest("Author does not exit - invalid id!");
             }
 
-            var books = author.Books.AsQueryable().Select(BookViewModel.ConvertToBookViewModel);
+            var books = author
+                .Books
+                .AsQueryable()
+                .Select(BookViewModel.Create);
 
-            return Ok(books);
+            return this.Ok(books);
         }
     }
 }

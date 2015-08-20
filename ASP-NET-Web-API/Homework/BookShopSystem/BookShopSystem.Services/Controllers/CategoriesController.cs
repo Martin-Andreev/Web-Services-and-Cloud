@@ -11,23 +11,15 @@
     [RoutePrefix("api/Categories")]
     public class CategoriesController : BaseApiController
     {
-        private IUserIdProvider userIdProvider;
-
-        public CategoriesController(IBookShopData data, IUserIdProvider userIdProvider)
-            : base(data)
-        {
-            this.userIdProvider = userIdProvider;
-        }
-
         [HttpGet]
         public IHttpActionResult GetCategories()
         {
             var categories = this.data
                 .Categories
                 .All()
-                .Select(CategoryViewModel.ConvertToCategoryViewModel);
+                .Select(CategoryViewModel.Create);
 
-            return Ok(categories);
+            return this.Ok(categories);
         }
 
         [HttpGet]
@@ -41,8 +33,8 @@
             }
 
             var categoryViewModel = CategoryViewModel.ConvertToCategoryViewModel(category);
-            
-            return Ok(categoryViewModel);
+
+            return this.Ok(categoryViewModel);
         }
 
         [HttpDelete]
@@ -59,7 +51,7 @@
             this.data.Categories.Delete(category);
             this.data.Save();
 
-            return Ok();
+            return this.Ok();
         }
 
         [HttpPost]
@@ -91,7 +83,7 @@
 
             CategoryViewModel categoryViewModel = CategoryViewModel.ConvertToCategoryViewModel(category);
 
-            return Ok(categoryViewModel);
+            return this.Ok(categoryViewModel);
         }
 
         [HttpPut]
@@ -127,7 +119,7 @@
 
             CategoryViewModel categoryViewModel = CategoryViewModel.ConvertToCategoryViewModel(existingCategory);
 
-            return Ok(categoryViewModel);
+            return this.Ok(categoryViewModel);
         }
     }
 }

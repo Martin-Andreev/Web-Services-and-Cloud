@@ -1,7 +1,9 @@
 ﻿namespace BookShopSystem.Services.Models.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
+    using System.Linq.Expressions;
     using BookShopSystem.Models;
 
     public class BookViewModel
@@ -23,18 +25,36 @@
         public AuthorViewModelMinified Author { get; set; }
 
         public DateTime ReleaseDate { get; set; }
+ 
+        public IEnumerable<string> Categories { get; set; }
 
-        public string Categories { get; set; } 
+        public static Expression<Func<Book, BookViewModel>> Create
+        {
+            get
+            {
+                return book => new BookViewModel
+                {
+                    Id = book.Id,
+                    Author = AuthorViewModelMinified.ConvertToAuthorViewModel(book.Author),
+                    Categories = book.Categories.Select(c => c.Name),
+                    Copies = book.Copies,
+                    Description = book.Description,
+                    EditionType = book.EditionType,
+                    Price = book.Price,
+                    Title = book.Title,
+                    AgeRestriction = book.AgeRestriction,
+                    ReleaseDate = book.ReleaseDate.Date
+                };
+            }
+        }
 
         public static BookViewModel ConvertToBookViewModel(Book book)
         {
-            string categories = string.Join(", ", book.Categories.Select(c => c.Name));
-
             BookViewModel bookViewModel = new BookViewModel
             {
                 Id = book.Id,
                 Author = AuthorViewModelMinified.ConvertToAuthorViewModel(book.Author),
-                Categories = categories,
+                Categories = book.Categories.Select(c => c.Name),
                 Copies = book.Copies,
                 Description = book.Description,
                 EditionType = book.EditionType,

@@ -5,10 +5,17 @@ namespace BookShopSystem.Data.Migrations
     using System.Data.Entity.Migrations;
     using System.IO;
     using System.Linq;
+    using System.Web.Hosting;
     using Models;
 
     public sealed class Configuration : DbMigrationsConfiguration<BookShopContext>
     {
+        private const string AuthorsSource = "authors.txt";
+        private const string BooksSource = "books.txt";
+        private const string CategoriesSource = "categories.txt";
+
+        private readonly string dataSource = HostingEnvironment.MapPath("~/App_Data/");
+
         public Configuration()
         {
             AutomaticMigrationsEnabled = true;
@@ -20,15 +27,15 @@ namespace BookShopSystem.Data.Migrations
         {
             if (!context.Books.Any())
             {
-                AddAuthors(context);
+                this.AddAuthors(context);
 
-                AddCategories(context);
+                this.AddCategories(context);
 
-                AddBooks(context);
+                this.AddBooks(context);
             }
         }
 
-        private static void AddBooks(BookShopContext context)
+        private void AddBooks(BookShopContext context)
         {
             const int maxCategoriesCount = 4;
             const int minCategoriesCount = 0;
@@ -36,7 +43,7 @@ namespace BookShopSystem.Data.Migrations
 
             var random = new Random();
 
-            using (var reader = new StreamReader("../../Data/books.txt"))
+            using (var reader = new StreamReader(this.dataSource + BooksSource))
             {
                 var line = reader.ReadLine();
                 line = reader.ReadLine();
@@ -48,6 +55,7 @@ namespace BookShopSystem.Data.Migrations
                     var authorIndex = random.Next(0, authors.Count);
                     var author = authors[authorIndex];
                     var edition = (EditionType) int.Parse(data[0]);
+                    var releaseDate = DateTime.Parse(data[1]);
                     var copies = int.Parse(data[2]);
                     var price = decimal.Parse(data[3]);
                     var title = data[5];
@@ -69,19 +77,20 @@ namespace BookShopSystem.Data.Migrations
                         Copies = copies,
                         Price = price,
                         Title = title,
+                        ReleaseDate = releaseDate,
                         Categories = categories
                     });
 
                     line = reader.ReadLine();
-                }
 
-                context.SaveChanges();
+                    context.SaveChanges();
+                }
             }
         }
 
-        private static void AddCategories(BookShopContext context)
+        private void AddCategories(BookShopContext context)
         {
-            using (var reader = new StreamReader("../../Data/categories.txt"))
+            using (var reader = new StreamReader(this.dataSource + CategoriesSource))
             {
                 var line = reader.ReadLine();
                 line = reader.ReadLine();
@@ -102,9 +111,9 @@ namespace BookShopSystem.Data.Migrations
             }
         }
 
-        private static void AddAuthors(BookShopContext context)
+        private void AddAuthors(BookShopContext context)
         {
-            using (var reader = new StreamReader("../../Data/authors.txt"))
+            using (var reader = new StreamReader(this.dataSource + AuthorsSource))
             {
                 var line = reader.ReadLine();
                 line = reader.ReadLine();

@@ -2,22 +2,12 @@
 {
     using System.Linq;
     using System.Web.Http;
-    using Data;
-    using Infrastructure;
     using Microsoft.AspNet.Identity.EntityFramework;
     using Models.ViewModels;
 
     [RoutePrefix("api/user")]
     public class UsersController : BaseApiController
     {
-        private IUserIdProvider userIdProvider;
-
-        public UsersController(IBookShopData data, IUserIdProvider userIdProvider) 
-            : base(data)
-        {
-            this.userIdProvider = userIdProvider;
-        }
-
         [HttpGet]
         [Route("{username}/purchases")]
         public IHttpActionResult UserPurchases(string username)
@@ -39,7 +29,7 @@
                 .Select(PurchaseViewModel.ConvertToPurchaseViewModel)
                 .OrderBy(p => p.DateOfPurchase);
 
-            return Ok(purchases);
+            return this.Ok(purchases);
         }
 
         [HttpPut]
@@ -88,7 +78,7 @@
             existingUser.Roles.Add(userRole);
             this.data.Save();
 
-            return Ok();
+            return this.Ok();
         }
 
         [HttpDelete]
@@ -122,8 +112,8 @@
 
             existingUser.Roles.Remove(userRole);
             this.data.Save();
-            
-            return Ok();
+
+            return this.Ok();
         }
     }
 }
