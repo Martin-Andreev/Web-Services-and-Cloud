@@ -22,12 +22,11 @@
                 return this.BadRequest("User does not exist - invalid username!");
             }
 
-            var purchases = this.data
-                .Purchases
-                .All()
-                .Where(p => p.UserId == user.Id)
-                .Select(PurchaseViewModel.ConvertToPurchaseViewModel)
-                .OrderBy(p => p.DateOfPurchase);
+            var purchases = user.Purchases
+                .OrderByDescending(p => p.DateOfPurchase)
+                .AsQueryable()
+                .Where(p => p.IsRecalled == false)
+                .Select(PurchaseViewModel.Create);
 
             return this.Ok(purchases);
         }
